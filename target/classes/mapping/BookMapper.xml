@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ray.dao.BookDao">
+
+    <!--
+        返回结果映射
+        如果开启驼峰命名转换且命名规范该段代码可以不写
+        因为配置别名 所以type属性使用的是mybatis-conf中的别名
+    -->
+
+    <resultMap id="BookBaseMap" type="com.ray.model.Book">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="book_name" property="bookName" jdbcType="VARCHAR"/>
+        <result column="book_writer" property="bookWriter" jdbcType="VARCHAR"/>
+        <result column="book_publisher" property="Publisher" jdbcType="VARCHAR"/>
+        <result column="book_isrent" property="isRent" jdbcType="BIGINT"/>
+        <result column="book_person" property="borrow_person" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--  定义字段集合 -->
+    <sql id="Base_Column_List">
+        id,book_name,book_writer,book_publisher,book_isrent,book_person
+    </sql>
+
+    <!-- 接口中具体实现-->
+    <select id="selectBookByBorrowPerson" parameterType="com.ray.model.Book" resultMap="BookBaseMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM book
+        WHERE book_person=#{borrow_person}
+    </select>
+
+    <select id="selectBookByName" parameterType="com.ray.model.Book" resultMap="BookBaseMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM book
+        WHERE book_name LIKE CONCAT('%', #{bookName}, '%')
+    </select>
+
+
+    <select id="selectBookByWriter" parameterType="com.ray.model.Book" resultMap="BookBaseMap">
+        SELECT * FROM book WHERE book_writer LIKE CONCAT('%', #{bookWriter}, '%')
+    </select>
+
+    <select id="selectBookById" parameterType="java.lang.Long" resultMap="BookBaseMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM book
+        WHERE id = #{id}
+    </select>
+
+    <!-- update
+        borrow -> 借
+        returnBook ->还
+    -->
+    <update id="borrow" parameterType="com.ray.model.Book">
+        update book set book_isrent=1,book_person=#{borrow_person} WHERE id=#{id}
+    </update>
+    <update id="returnBook" parameterType="com.ray.model.Book">
+        update book set book_isrent=0,book_person='' WHERE id=#{id}
+    </update>
+
+    <!-- insert -->
+    <insert id="save" parameterType="com.ray.model.Book">
+        insert into book (book_name,book_writer,book_publisher,book_isrent) values
+        (#{bookName},#{bookWriter},#{Publisher},#{isrent})
+    </insert>
+
+    <select id="showAllBook1" resultMap="BookBaseMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_book
+    </select>
+
+    <!-- 相当于select * from(不推荐) -->
+    <select id="showAllBook" resultMap="BookBaseMap">
+        SELECT * FROM book
+    </select>
+</mapper>

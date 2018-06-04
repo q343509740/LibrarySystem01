@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ray.dao.UserDao">
+    <resultMap id="UserBaseMap" type="com.ray.model.User">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="user_email" property="userEmail" jdbcType="VARCHAR"/>
+        <result column="user_pwd" property="userPwd" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_name,user_email,user_pwd
+    </sql>
+
+    <select id="selectUserById" parameterType="java.lang.Long" resultMap="UserBaseMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user
+        WHERE id = #{Id}
+    </select>
+
+    <select id="selectUser" parameterType="com.ray.model.User" resultMap="UserBaseMap">
+        SELECT
+        <!--<include refid="Base_Column_List"/>-->
+        *
+        FROM user WHERE user_name = #{userName}
+    </select>
+
+    <select id="selectAllUser" resultMap="UserBaseMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user
+    </select>
+
+    <update id="updatePass" parameterType="com.ray.model.User">
+        UPDATE user SET user_pwd=#{userPwd} WHERE
+        user_name=#{userName}
+    </update>
+
+    <insert id="save" parameterType="com.ray.model.User">
+        INSERT INTO user(user_name,user_email,user_pwd) VALUES
+        (#{userName},#{userEmail},#{userPwd})
+    </insert>
+</mapper>
